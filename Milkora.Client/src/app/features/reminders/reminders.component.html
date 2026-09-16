@@ -1,0 +1,46 @@
+<app-page-header title="Reminders" subtitle="Everything that needs your attention"></app-page-header>
+
+@if (loading()) {
+  <app-spinner />
+} @else {
+  <div class="grid cols-3">
+    <div class="card">
+      <h3>💉 Health due (30 days)</h3>
+      @if (reminders().length) {
+        @for (r of reminders(); track r.healthId) {
+          <div class="rem-item">
+            <div><strong>{{ r.recordType }}</strong> · {{ r.tagNumber || 'Animal' }}<br><span class="muted">{{ r.medicineName || '' }}</span></div>
+            <span class="badge" [ngClass]="r.daysUntilDue < 0 ? 'low' : 'pending'">{{ r.daysUntilDue < 0 ? 'Overdue' : 'in ' + r.daysUntilDue + 'd' }}</span>
+          </div>
+        }
+      } @else { <p class="muted">Nothing due. ✅</p> }
+      <a class="btn btn-ghost btn-sm mt" routerLink="/health">Open Health</a>
+    </div>
+
+    <div class="card">
+      <h3>🌾 Low feed stock</h3>
+      @if (lowStock().length) {
+        @for (f of lowStock(); track f.inventoryId) {
+          <div class="rem-item">
+            <div><strong>{{ f.itemName }}</strong><br><span class="muted">min {{ f.minimumLevel }} {{ f.unit }}</span></div>
+            <span class="badge low">{{ f.quantityInStock }} {{ f.unit }}</span>
+          </div>
+        }
+      } @else { <p class="muted">All good. ✅</p> }
+      <a class="btn btn-ghost btn-sm mt" routerLink="/feed">Open Feed</a>
+    </div>
+
+    <div class="card">
+      <h3>💰 Pending payments</h3>
+      @if (pending().length) {
+        @for (s of pending(); track s.saleId) {
+          <div class="rem-item">
+            <div><strong>{{ s.buyerName }}</strong><br><span class="muted">{{ s.saleDate | date:'dd MMM yy' }}</span></div>
+            <span class="badge pending">{{ s.totalAmount | currency:'INR':'symbol':'1.0-0' }}</span>
+          </div>
+        }
+      } @else { <p class="muted">No pending payments. ✅</p> }
+      <a class="btn btn-ghost btn-sm mt" routerLink="/sales">Open Sales</a>
+    </div>
+  </div>
+}

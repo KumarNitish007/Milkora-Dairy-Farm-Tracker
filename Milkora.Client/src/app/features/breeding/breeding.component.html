@@ -1,0 +1,80 @@
+<app-page-header title="Breeding" subtitle="Insemination, pregnancy & calving (expected delivery auto = +280 days)">
+  <button class="btn btn-primary" (click)="openCreate()">＋ Add Record</button>
+</app-page-header>
+
+<div class="toolbar">
+  <div class="field" style="margin:0">
+    <label>Animal</label>
+    <select class="select" [(ngModel)]="animalFilter" (change)="load()">
+      <option value="">All</option>
+      @for (a of animals(); track a.animalId) { <option [value]="a.animalId">{{ a.tagNumber }}</option> }
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (records().length === 0) {
+  <app-empty-state icon="🐮" message="No breeding records yet." />
+} @else {
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Animal</th><th>Insemination</th><th>Bull / Semen</th><th>Status</th><th>Expected Delivery</th><th>Calving</th><th></th></tr></thead>
+      <tbody>
+        @for (r of records(); track r.breedingId) {
+          <tr>
+            <td>{{ r.tagNumber || '—' }}</td>
+            <td>{{ r.inseminationDate | date:'dd MMM yy' }}</td>
+            <td>{{ r.bullDetails || '—' }}</td>
+            <td><span class="badge" [ngClass]="statusClass(r.pregnancyStatus)">{{ r.pregnancyStatus }}</span></td>
+            <td>{{ r.expectedDeliveryDate ? (r.expectedDeliveryDate | date:'dd MMM yy') : '—' }}</td>
+            <td>{{ r.calvingDate ? (r.calvingDate | date:'dd MMM yy') : '—' }}</td>
+            <td class="right">
+              @if (!r.calvingDate) { <button class="btn btn-ghost btn-sm" (click)="openCalving(r)">Record Calving</button> }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+@if (showForm()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><h3>Add Breeding Record</h3><button class="icon-btn" (click)="close()">✕</button></div>
+      <div class="form-row">
+        <div class="field"><label>Insemination Date</label><input class="input" type="date" [(ngModel)]="form.inseminationDate"></div>
+        <div class="field"><label>Animal</label>
+          <select class="select" [(ngModel)]="form.animalId">
+            <option [ngValue]="null">— none —</option>
+            @for (a of animals(); track a.animalId) { <option [ngValue]="a.animalId">{{ a.tagNumber }} — {{ a.name }}</option> }
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Bull / Semen Details</label><input class="input" [(ngModel)]="form.bullDetails"></div>
+      <div class="field"><label>Pregnancy Status</label>
+        <select class="select" [(ngModel)]="form.pregnancyStatus">@for (s of statuses; track s) { <option [value]="s">{{ s }}</option> }</select>
+      </div>
+      <div class="field"><label>Notes</label><textarea class="input" rows="2" [(ngModel)]="form.notes"></textarea></div>
+      <div class="flex gap" style="justify-content:flex-end">
+        <button class="btn btn-ghost" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showCalving()) {
+  <div class="modal-backdrop" (click)="closeCalving()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><h3>Record Calving</h3><button class="icon-btn" (click)="closeCalving()">✕</button></div>
+      <div class="field"><label>Calving Date</label><input class="input" type="date" [(ngModel)]="calving.calvingDate"></div>
+      <div class="field"><label>Calf Details</label><input class="input" [(ngModel)]="calving.calfDetails" placeholder="e.g. Female calf, healthy"></div>
+      <div class="flex gap" style="justify-content:flex-end">
+        <button class="btn btn-ghost" (click)="closeCalving()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="saving()" (click)="saveCalving()">Save</button>
+      </div>
+    </div>
+  </div>
+}

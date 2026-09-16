@@ -1,0 +1,123 @@
+<app-page-header title="Today at a glance" [subtitle]="todayStr"></app-page-header>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (summary()) {
+  @let s = summary()!;
+  <div class="grid cols-4">
+    <app-stat-card [accent]="true" label="Milk Today" [value]="s.totalMilkLitres + ' L'" hint="morning + evening"></app-stat-card>
+    <app-stat-card label="Income" [value]="s.totalIncome | currency:'INR':'symbol':'1.0-0'"></app-stat-card>
+    <app-stat-card label="Expense" [value]="s.totalExpense | currency:'INR':'symbol':'1.0-0'"></app-stat-card>
+    <app-stat-card label="Profit / Loss"
+      [value]="s.profitOrLoss | currency:'INR':'symbol':'1.0-0'"
+      [tone]="s.profitOrLoss >= 0 ? 'profit' : 'loss'"></app-stat-card>
+  </div>
+
+  <div class="grid cols-4 mt">
+    <app-stat-card label="Active Animals" [value]="s.activeAnimals"></app-stat-card>
+    <app-stat-card label="Sick" [value]="s.sickAnimals" [tone]="s.sickAnimals ? 'loss' : 'default'"></app-stat-card>
+    <app-stat-card label="Low Feed Items" [value]="s.lowStockItems" [tone]="s.lowStockItems ? 'loss' : 'default'"></app-stat-card>
+    <app-stat-card label="Pending Payments" [value]="s.pendingPayments"></app-stat-card>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="card mt">
+    <h3>Quick add</h3>
+    <div class="flex gap" style="flex-wrap:wrap; margin-top:10px">
+      <a class="btn btn-primary" routerLink="/milk-log">🥛 Add Milk</a>
+      <a class="btn btn-ghost" routerLink="/expenses">🧾 Add Expense</a>
+      <a class="btn btn-ghost" routerLink="/animals">🐄 Add Animal</a>
+      <a class="btn btn-ghost" routerLink="/sales">💰 Add Sale</a>
+    </div>
+  </div>
+
+  <!-- AI insights (ML.NET) -->
+  <div class="card mt">
+    <h3>🤖 AI insights <span class="ai-tag">ML.NET</span></h3>
+    <div class="grid cols-2 mt">
+      <div>
+        <span class="muted">Milk forecast · next {{ forecast()?.days || 7 }} days</span>
+        @if (forecast()?.points?.length) {
+          <div class="ai-forecast">
+            <div class="ai-figure">
+              <strong>{{ forecast()!.projectedTotal | number:'1.0-0' }} L</strong>
+              <span class="muted">≈ {{ forecast()!.dailyAverage | number:'1.0-1' }} L/day</span>
+            </div>
+            <div class="spark">
+              @for (p of forecast()!.points; track p.step) {
+                <div class="spark-bar" [style.height.%]="barHeight(p.value)" [title]="p.date + ': ' + p.value + ' L'"></div>
+              }
+            </div>
+          </div>
+          <span class="muted" style="font-size:.78rem">Model: {{ forecast()!.basis === 'ssa' ? 'time-series (SSA)' : 'moving average' }}</span>
+        } @else {
+          <p class="muted mt">{{ forecast()?.message || 'Collecting data — insights appear once you have a few weeks of logs.' }}</p>
+        }
+      </div>
+
+      <div>
+        <span class="muted">Milk-drop alerts</span>
+        @if (anomalies().length) {
+          @for (a of anomalies(); track (a.animalId || '') + a.date) {
+            <div class="rem-item">
+              <div><strong>{{ a.tagNumber }}</strong> {{ a.animalName ? '· ' + a.animalName : '' }}<br>
+                <span class="muted">{{ a.date | date:'dd MMM' }} · expected {{ a.expected | number:'1.0-1' }} L, got {{ a.value | number:'1.0-1' }} L</span></div>
+              <span class="badge" [ngClass]="a.severity === 'High' ? 'low' : 'pending'">↓ {{ a.dropPercent }}%</span>
+            </div>
+          }
+        } @else {
+          <p class="muted mt">No abnormal milk drops detected. ✅</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-2 mt">
+    <div class="card">
+      <h3>🔔 Upcoming reminders</h3>
+      @if (reminders().length) {
+        <div class="table-wrap mt">
+          <table class="data">
+            <thead><tr><th>Animal</th><th>Type</th><th>Medicine</th><th>Due</th></tr></thead>
+            <tbody>
+              @for (r of reminders(); track r.healthId) {
+                <tr>
+                  <td>{{ r.tagNumber || '—' }}</td>
+                  <td>{{ r.recordType }}</td>
+                  <td>{{ r.medicineName || '—' }}</td>
+                  <td>
+                    <span class="badge" [class.pending]="r.daysUntilDue >= 0" [class.low]="r.daysUntilDue < 0">
+                      {{ r.daysUntilDue < 0 ? 'Overdue' : 'in ' + r.daysUntilDue + 'd' }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else { <p class="muted mt">No reminders due in the next 7 days. ✅</p> }
+    </div>
+
+    <div class="card">
+      <h3>🌾 Low feed stock</h3>
+      @if (lowStock().length) {
+        <div class="table-wrap mt">
+          <table class="data">
+            <thead><tr><th>Item</th><th class="num">In stock</th><th class="num">Min</th></tr></thead>
+            <tbody>
+              @for (f of lowStock(); track f.inventoryId) {
+                <tr>
+                  <td>{{ f.itemName }}</td>
+                  <td class="num text-loss">{{ f.quantityInStock }} {{ f.unit }}</td>
+                  <td class="num">{{ f.minimumLevel }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else { <p class="muted mt">All feed above minimum levels. ✅</p> }
+    </div>
+  </div>
+} @else {
+  <p class="muted">Could not load the dashboard.</p>
+}

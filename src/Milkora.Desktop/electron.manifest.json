@@ -1,0 +1,44 @@
+{
+  "executable": "Milkora.Desktop",
+  "splashscreen": {
+    "imageFile": ""
+  },
+  "name": "milkora-dairy-farm-tracker",
+  "author": "Milkora",
+  "singleInstance": true,
+  "environment": "Production",
+  "build": {
+    "appId": "com.milkora.dairyfarmtracker",
+    "productName": "Milkora Dairy Farm Tracker",
+    "copyright": "Copyright © 2026 Milkora",
+    "buildVersion": "1.0.0",
+    "compression": "maximum",
+    "asar": true,
+    "directories": {
+      "output": "bin/Desktop"
+    },
+    "extraResources": [
+      {
+        "from": "./bin/Release/net8.0/win-unpacked",
+        "to": "bin",
+        "filter": [ "**/*" ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "Assets/icon.ico"
+    },
+    "nsis": {
+      "installerIcon": "Assets/icon.ico",
+      "uninstallerIcon": "Assets/icon.ico"
+    },
+    "files": [
+      {
+        "from": "./obj/Host/bin",
+        "to": "bin",
+        "filter": [ "**/*" ]
+      },
+      "**/*"
+    ]
+  }
+}

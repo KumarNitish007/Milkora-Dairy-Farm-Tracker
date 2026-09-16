@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Milkora.SyncClient</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Device-side sync engine: local SQLite <-> central API sync endpoint.
+       Reusable by the Electron/desktop host (Step 6). -->
+  <ItemGroup>
+    <PackageReference Include="Dotmim.Sync.Sqlite" Version="1.3.0" />
+    <PackageReference Include="Dotmim.Sync.Web.Client" Version="1.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+
+</Project>

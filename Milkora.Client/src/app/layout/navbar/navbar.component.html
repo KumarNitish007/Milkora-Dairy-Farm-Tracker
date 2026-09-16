@@ -1,0 +1,62 @@
+<header class="nav">
+  <div class="nav-inner">
+    <!-- Brand -->
+    <a class="brand" routerLink="/dashboard" (click)="closeAll()">
+      <img class="logo" src="favicon.svg" alt="Milkora logo" width="40" height="40">
+      <span class="brand-text">Milkora<small>Dairy Farm Tracker</small></span>
+    </a>
+
+    <!-- Desktop navigation (grouped — no scroll) -->
+    <nav class="nav-desktop">
+      <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+        <span class="i">{{ dashboard.icon }}</span>{{ dashboard.label }}
+      </a>
+
+      @for (g of groups; track g.key) {
+        <div class="nav-group" [class.open]="openGroup() === g.key">
+          <button type="button" class="nav-item" [class.active]="isGroupActive(g)" (click)="toggleGroup(g.key)">
+            <span class="i">{{ g.icon }}</span>{{ g.label }}<span class="caret">▾</span>
+          </button>
+          <div class="dropdown">
+            @for (c of g.children; track c.path) {
+              <a [routerLink]="c.path" routerLinkActive="active" (click)="closeAll()">
+                <span class="i">{{ c.icon }}</span>{{ c.label }}
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </nav>
+
+    <!-- Right cluster -->
+    <div class="nav-right">
+      <button class="sync-chip" [attr.data-state]="sync.state()" (click)="sync.syncNow()" title="Sync now">
+        <span class="dot"></span><span class="sync-text">{{ sync.label() }}</span>
+      </button>
+      <a class="gear" routerLink="/settings" routerLinkActive="active" title="Settings" (click)="closeAll()">⚙️</a>
+      <button class="hamburger" (click)="toggleMobile()" [attr.aria-expanded]="menuOpen()" aria-label="Menu">
+        {{ menuOpen() ? '✕' : '☰' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile drawer (grouped sections) -->
+  <nav class="nav-mobile" [class.open]="menuOpen()">
+    <a class="m-link" routerLink="/dashboard" routerLinkActive="active" (click)="closeAll()">
+      <span class="i">{{ dashboard.icon }}</span>Dashboard
+    </a>
+    @for (g of groups; track g.key) {
+      <div class="m-section">
+        <div class="m-title">{{ g.label }}</div>
+        @for (c of g.children; track c.path) {
+          <a class="m-link" [routerLink]="c.path" routerLinkActive="active" (click)="closeAll()">
+            <span class="i">{{ c.icon }}</span>{{ c.label }}
+          </a>
+        }
+      </div>
+    }
+    <a class="m-link" routerLink="/settings" routerLinkActive="active" (click)="closeAll()">
+      <span class="i">{{ settings.icon }}</span>Settings
+    </a>
+  </nav>
+</header>

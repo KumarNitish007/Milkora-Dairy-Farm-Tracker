@@ -1,0 +1,63 @@
+<app-page-header title="Income" subtitle="All income sources">
+  <button class="btn btn-primary" (click)="openCreate()">＋ Add Income</button>
+</app-page-header>
+
+<div class="toolbar">
+  <div class="field" style="margin:0"><label>From</label><input class="input" type="date" [(ngModel)]="start"></div>
+  <div class="field" style="margin:0"><label>To</label><input class="input" type="date" [(ngModel)]="end"></div>
+  <div class="field" style="margin:0">
+    <label>Category</label>
+    <select class="select" [(ngModel)]="categoryFilter">
+      <option value="">All</option>
+      @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
+    </select>
+  </div>
+  <button class="btn btn-ghost" (click)="load()">Apply</button>
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else {
+  <div class="card mb"><span class="muted">Total income</span><h2 style="margin:.2em 0 0" class="text-profit">{{ total() | currency:'INR':'symbol':'1.0-0' }}</h2></div>
+
+  @if (items().length === 0) {
+    <app-empty-state icon="📈" message="No income in this range." />
+  } @else {
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="num">Amount</th></tr></thead>
+        <tbody>
+          @for (i of items(); track i.incomeId) {
+            <tr>
+              <td>{{ i.incomeDate | date:'dd MMM' }}</td>
+              <td><span class="badge ok">{{ i.category }}</span></td>
+              <td>{{ i.description || '—' }}</td>
+              <td class="num text-profit">{{ i.amount | currency:'INR':'symbol':'1.0-0' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+@if (showForm()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><h3>Add Income</h3><button class="icon-btn" (click)="close()">✕</button></div>
+      <div class="form-row">
+        <div class="field"><label>Date</label><input class="input" type="date" [(ngModel)]="form.incomeDate"></div>
+        <div class="field"><label>Category</label>
+          <select class="select" [(ngModel)]="form.category">@for (c of categories; track c) { <option [value]="c">{{ c }}</option> }</select>
+        </div>
+      </div>
+      <div class="field"><label>Description</label><input class="input" [(ngModel)]="form.description"></div>
+      <div class="field"><label>Amount (₹)</label><input class="input" type="number" step="1" [(ngModel)]="form.amount"></div>
+      <div class="field"><label>Notes</label><textarea class="input" rows="2" [(ngModel)]="form.notes"></textarea></div>
+      <div class="flex gap" style="justify-content:flex-end">
+        <button class="btn btn-ghost" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+      </div>
+    </div>
+  </div>
+}

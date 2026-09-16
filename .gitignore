@@ -1,0 +1,36 @@
+# ---- Secrets (never commit) ------------------------------------------------
+**/appsettings.Development.json
+**/appsettings.*.Local.json
+*.env
+
+# ---- .NET build output -----------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+publish/
+*.user
+*.suo
+.vs/
+TestResults/
+
+# ---- Electron / desktop ----------------------------------------------------
+src/Milkora.Desktop/wwwroot/          # built Angular copy (regenerated)
+src/Milkora.Desktop/obj/Host/         # electronize intermediate
+src/Milkora.Desktop/bin/Desktop/      # installer output
+
+# ---- Angular ---------------------------------------------------------------
+Milkora.Client/node_modules/
+Milkora.Client/dist/
+Milkora.Client/.angular/
+Milkora.Client/coverage/
+
+# ---- Local SQLite databases ------------------------------------------------
+*.db
+*.db-shm
+*.db-wal
+
+# ---- OS / editor -----------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.log

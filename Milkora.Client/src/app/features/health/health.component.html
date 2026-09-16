@@ -1,0 +1,81 @@
+<app-page-header title="Health" subtitle="Vaccines, deworming, checkups & treatment">
+  <button class="btn btn-primary" (click)="openCreate()">＋ Add Record</button>
+</app-page-header>
+
+<div class="toolbar">
+  <div class="field" style="margin:0">
+    <label>Animal</label>
+    <select class="select" [(ngModel)]="animalFilter" (change)="load()">
+      <option value="">All</option>
+      @for (a of animals(); track a.animalId) { <option [value]="a.animalId">{{ a.tagNumber }}</option> }
+    </select>
+  </div>
+  <div class="field" style="margin:0">
+    <label>Type</label>
+    <select class="select" [(ngModel)]="typeFilter" (change)="load()">
+      <option value="">All</option>
+      @for (t of types; track t) { <option [value]="t">{{ t }}</option> }
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (records().length === 0) {
+  <app-empty-state icon="💉" message="No health records yet." />
+} @else {
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Date</th><th>Animal</th><th>Type</th><th>Medicine</th><th>Vet</th><th class="num">Cost</th><th>Next Due</th></tr></thead>
+      <tbody>
+        @for (r of records(); track r.healthId) {
+          <tr>
+            <td>{{ r.recordDate | date:'dd MMM yy' }}</td>
+            <td>{{ r.tagNumber || '—' }}</td>
+            <td><span class="badge info">{{ r.recordType }}</span></td>
+            <td>{{ r.medicineName || '—' }}</td>
+            <td>{{ r.vetName || '—' }}</td>
+            <td class="num">{{ r.cost ? (r.cost | currency:'INR':'symbol':'1.0-0') : '—' }}</td>
+            <td>{{ r.nextDueDate ? (r.nextDueDate | date:'dd MMM yy') : '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+@if (showForm()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><h3>Add Health Record</h3><button class="icon-btn" (click)="close()">✕</button></div>
+      <div class="form-row">
+        <div class="field"><label>Date</label><input class="input" type="date" [(ngModel)]="form.recordDate"></div>
+        <div class="field"><label>Type</label>
+          <select class="select" [(ngModel)]="form.recordType">@for (t of types; track t) { <option [value]="t">{{ t }}</option> }</select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Animal (optional)</label>
+          <select class="select" [(ngModel)]="form.animalId">
+            <option [ngValue]="null">— none —</option>
+            @for (a of animals(); track a.animalId) { <option [ngValue]="a.animalId">{{ a.tagNumber }} — {{ a.name }}</option> }
+          </select>
+        </div>
+        <div class="field"><label>Medicine</label><input class="input" [(ngModel)]="form.medicineName"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Vet Name</label><input class="input" [(ngModel)]="form.vetName"></div>
+        <div class="field"><label>Vet Contact</label><input class="input" [(ngModel)]="form.vetContact"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Cost (₹)</label><input class="input" type="number" step="1" [(ngModel)]="form.cost"></div>
+        <div class="field"><label>Next Due Date</label><input class="input" type="date" [(ngModel)]="form.nextDueDate"></div>
+      </div>
+      <div class="field"><label>Notes</label><textarea class="input" rows="2" [(ngModel)]="form.notes"></textarea></div>
+      <div class="flex gap" style="justify-content:flex-end">
+        <button class="btn btn-ghost" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+      </div>
+    </div>
+  </div>
+}

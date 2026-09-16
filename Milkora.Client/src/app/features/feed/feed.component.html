@@ -1,0 +1,76 @@
+<app-page-header title="Feed Inventory" subtitle="Stock levels & low-stock alerts">
+  <button class="btn btn-primary" (click)="openCreate()">＋ Add Item</button>
+</app-page-header>
+
+<div class="toolbar">
+  <input class="input grow" placeholder="🔎 Search item…" [(ngModel)]="search" (keyup.enter)="load()">
+  <button class="btn btn-ghost" (click)="load()">Search</button>
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (items().length === 0) {
+  <app-empty-state icon="🌾" message="No feed items yet." />
+} @else {
+  <div class="table-wrap">
+    <table class="data">
+      <thead><tr><th>Item</th><th class="num">In Stock</th><th class="num">Min</th><th class="num">Daily Use</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        @for (f of items(); track f.inventoryId) {
+          <tr>
+            <td><strong>{{ f.itemName }}</strong></td>
+            <td class="num">{{ f.quantityInStock }} {{ f.unit }}</td>
+            <td class="num">{{ f.minimumLevel }}</td>
+            <td class="num">{{ f.dailyUsage ?? '—' }}</td>
+            <td>
+              @if (f.isLowStock) { <span class="badge low">Low stock</span> }
+              @else { <span class="badge ok">OK</span> }
+            </td>
+            <td class="right"><button class="btn btn-ghost btn-sm" (click)="openStock(f)">Update Stock</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+@if (showForm()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><h3>Add Feed Item</h3><button class="icon-btn" (click)="close()">✕</button></div>
+      <div class="form-row">
+        <div class="field"><label>Item Name *</label><input class="input" [(ngModel)]="form.itemName"></div>
+        <div class="field"><label>Unit</label>
+          <select class="select" [(ngModel)]="form.unit">@for (u of units; track u) { <option [value]="u">{{ u }}</option> }</select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Quantity In Stock</label><input class="input" type="number" step="0.1" [(ngModel)]="form.quantityInStock"></div>
+        <div class="field"><label>Minimum Level</label><input class="input" type="number" step="0.1" [(ngModel)]="form.minimumLevel"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Daily Usage</label><input class="input" type="number" step="0.1" [(ngModel)]="form.dailyUsage"></div>
+        <div class="field"><label>Cost (₹)</label><input class="input" type="number" step="1" [(ngModel)]="form.cost"></div>
+      </div>
+      <div class="field"><label>Purchase Date</label><input class="input" type="date" [(ngModel)]="form.purchaseDate"></div>
+      <div class="field"><label>Notes</label><textarea class="input" rows="2" [(ngModel)]="form.notes"></textarea></div>
+      <div class="flex gap" style="justify-content:flex-end">
+        <button class="btn btn-ghost" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showStock()) {
+  <div class="modal-backdrop" (click)="closeStock()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><h3>Update Stock — {{ stockFor()?.itemName }}</h3><button class="icon-btn" (click)="closeStock()">✕</button></div>
+      <div class="field"><label>Quantity In Stock</label><input class="input" type="number" step="0.1" [(ngModel)]="stockQty"></div>
+      <div class="flex gap" style="justify-content:flex-end">
+        <button class="btn btn-ghost" (click)="closeStock()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="saving()" (click)="saveStock()">Save</button>
+      </div>
+    </div>
+  </div>
+}

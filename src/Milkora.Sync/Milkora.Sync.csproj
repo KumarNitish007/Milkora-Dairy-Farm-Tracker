@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Milkora.Sync</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Shared sync configuration used by BOTH the server (API) and the future
+       SQLite client, so the table list / conflict policy live in one place. -->
+  <ItemGroup>
+    <PackageReference Include="Dotmim.Sync.Core" Version="1.3.0" />
+  </ItemGroup>
+
+</Project>

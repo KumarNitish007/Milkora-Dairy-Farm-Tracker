@@ -1,0 +1,70 @@
+<app-page-header title="Expenses" subtitle="Track farm spending by category">
+  <button class="btn btn-primary" (click)="openCreate()">＋ Add Expense</button>
+</app-page-header>
+
+<div class="toolbar">
+  <div class="field" style="margin:0"><label>From</label><input class="input" type="date" [(ngModel)]="start"></div>
+  <div class="field" style="margin:0"><label>To</label><input class="input" type="date" [(ngModel)]="end"></div>
+  <div class="field" style="margin:0">
+    <label>Category</label>
+    <select class="select" [(ngModel)]="categoryFilter">
+      <option value="">All</option>
+      @for (c of categories; track c) { <option [value]="c">{{ c }}</option> }
+    </select>
+  </div>
+  <button class="btn btn-ghost" (click)="load()">Apply</button>
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else {
+  <div class="card mb"><span class="muted">Total expense</span><h2 style="margin:.2em 0 0" class="text-loss">{{ total() | currency:'INR':'symbol':'1.0-0' }}</h2></div>
+
+  @if (items().length === 0) {
+    <app-empty-state icon="🧾" message="No expenses in this range." />
+  } @else {
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="num">Amount</th><th>Mode</th><th></th></tr></thead>
+        <tbody>
+          @for (e of items(); track e.expenseId) {
+            <tr>
+              <td>{{ e.expenseDate | date:'dd MMM' }}</td>
+              <td><span class="badge gray">{{ e.category }}</span></td>
+              <td>{{ e.description || '—' }}</td>
+              <td class="num text-loss">{{ e.amount | currency:'INR':'symbol':'1.0-0' }}</td>
+              <td>{{ e.paymentMode || '—' }}</td>
+              <td class="right"><button class="btn btn-danger btn-sm" (click)="remove(e)">Delete</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+@if (showForm()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head"><h3>Add Expense</h3><button class="icon-btn" (click)="close()">✕</button></div>
+      <div class="form-row">
+        <div class="field"><label>Date</label><input class="input" type="date" [(ngModel)]="form.expenseDate"></div>
+        <div class="field"><label>Category</label>
+          <select class="select" [(ngModel)]="form.category">@for (c of categories; track c) { <option [value]="c">{{ c }}</option> }</select>
+        </div>
+      </div>
+      <div class="field"><label>Description</label><input class="input" [(ngModel)]="form.description"></div>
+      <div class="form-row">
+        <div class="field"><label>Amount (₹)</label><input class="input" type="number" step="1" [(ngModel)]="form.amount"></div>
+        <div class="field"><label>Payment Mode</label>
+          <select class="select" [(ngModel)]="form.paymentMode">@for (m of modes; track m) { <option [value]="m">{{ m }}</option> }</select>
+        </div>
+      </div>
+      <div class="field"><label>Notes</label><textarea class="input" rows="2" [(ngModel)]="form.notes"></textarea></div>
+      <div class="flex gap" style="justify-content:flex-end">
+        <button class="btn btn-ghost" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,75 @@
+<app-page-header title="Reports" subtitle="Profit & loss and per-animal performance">
+  <button class="btn btn-ghost" onclick="window.print()">🖨️ Print</button>
+</app-page-header>
+
+<div class="toolbar">
+  <div class="field" style="margin:0"><label>From</label><input class="input" type="date" [(ngModel)]="start"></div>
+  <div class="field" style="margin:0"><label>To</label><input class="input" type="date" [(ngModel)]="end"></div>
+  <button class="btn btn-primary" (click)="load()">Run</button>
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (pl()) {
+  @let p = pl()!;
+  <div class="grid cols-3">
+    <div class="card"><span class="muted">Total Income</span><h2 style="margin:.2em 0 0" class="text-profit">{{ p.totalIncome | currency:'INR':'symbol':'1.0-0' }}</h2></div>
+    <div class="card"><span class="muted">Total Expense</span><h2 style="margin:.2em 0 0" class="text-loss">{{ p.totalExpense | currency:'INR':'symbol':'1.0-0' }}</h2></div>
+    <div class="card"><span class="muted">Net Profit / Loss</span><h2 style="margin:.2em 0 0" [class.text-profit]="p.profitOrLoss>=0" [class.text-loss]="p.profitOrLoss<0">{{ p.profitOrLoss | currency:'INR':'symbol':'1.0-0' }}</h2></div>
+  </div>
+
+  <div class="grid cols-2 mt">
+    <div class="card">
+      <h3>Income by category</h3>
+      @if (p.incomeByCategory.length) {
+        @for (c of p.incomeByCategory; track c.category) {
+          <div class="bar-row">
+            <span class="bar-label">{{ c.category }}</span>
+            <div class="bar-track"><div class="bar-fill income" [style.width.%]="barWidth(c, p.incomeByCategory)"></div></div>
+            <span class="bar-val">{{ c.amount | currency:'INR':'symbol':'1.0-0' }}</span>
+          </div>
+        }
+      } @else { <p class="muted">No income in this range.</p> }
+    </div>
+
+    <div class="card">
+      <h3>Expense by category</h3>
+      @if (p.expenseByCategory.length) {
+        @for (c of p.expenseByCategory; track c.category) {
+          <div class="bar-row">
+            <span class="bar-label">{{ c.category }}</span>
+            <div class="bar-track"><div class="bar-fill expense" [style.width.%]="barWidth(c, p.expenseByCategory)"></div></div>
+            <span class="bar-val">{{ c.amount | currency:'INR':'symbol':'1.0-0' }}</span>
+          </div>
+        }
+      } @else { <p class="muted">No expenses in this range.</p> }
+    </div>
+  </div>
+
+  <div class="card mt">
+    <h3>Per-animal milk yield</h3>
+    @if (yield().length) {
+      <div class="table-wrap mt">
+        <table class="data">
+          <thead><tr><th>Tag</th><th>Name</th><th>Status</th><th>Yield</th><th class="num">Total (L)</th><th class="num">Days</th><th class="num">Avg/day</th><th class="num">Value</th></tr></thead>
+          <tbody>
+            @for (y of yield(); track y.animalId) {
+              <tr>
+                <td><strong>{{ y.tagNumber }}</strong></td>
+                <td>{{ y.animalName || '—' }}</td>
+                <td><span class="badge gray">{{ y.status }}</span></td>
+                <td style="min-width:140px">
+                  <div class="bar-track sm"><div class="bar-fill income" [style.width.%]="(y.totalMilkLitres / maxYield()) * 100"></div></div>
+                </td>
+                <td class="num"><strong>{{ y.totalMilkLitres | number:'1.0-1' }}</strong></td>
+                <td class="num">{{ y.daysRecorded }}</td>
+                <td class="num">{{ y.avgDailyYield | number:'1.0-1' }}</td>
+                <td class="num">{{ y.totalValue | currency:'INR':'symbol':'1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else { <p class="muted mt">No milk records in this range.</p> }
+  </div>
+}
