@@ -13,13 +13,12 @@
     "copyright": "Copyright © 2026 Milkora",
     "buildVersion": "1.0.0",
     "compression": "maximum",
-    "asar": true,
     "directories": {
-      "output": "bin/Desktop"
+      "output": "../../../bin/Desktop"
     },
     "extraResources": [
       {
-        "from": "./bin/Release/net8.0/win-unpacked",
+        "from": "./bin",
         "to": "bin",
         "filter": [ "**/*" ]
       }
@@ -29,13 +28,15 @@
       "icon": "C:/NK_BACK/OneDrive - Shapoorji Pallonji & Company Pvt. Limited/NITISH/MILKORA/Milkora.DairyFarm/src/Milkora.Desktop/Assets/icon.ico"
     },
     "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
       "installerIcon": "C:/NK_BACK/OneDrive - Shapoorji Pallonji & Company Pvt. Limited/NITISH/MILKORA/Milkora.DairyFarm/src/Milkora.Desktop/Assets/icon.ico",
       "uninstallerIcon": "C:/NK_BACK/OneDrive - Shapoorji Pallonji & Company Pvt. Limited/NITISH/MILKORA/Milkora.DairyFarm/src/Milkora.Desktop/Assets/icon.ico"
     },
     "files": [
       {
-        "from": "./obj/Host/bin",
-        "to": "bin",
+        "from": "./ElectronHostHook/node_modules",
+        "to": "ElectronHostHook/node_modules",
         "filter": [ "**/*" ]
       },
       "**/*"
