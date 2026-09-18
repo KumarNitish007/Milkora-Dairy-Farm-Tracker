@@ -8,6 +8,9 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <!-- Must stay off: Microsoft.Data.Sqlite (the sync engine) requires ICU globalization. -->
     <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- The referenced API brings a duplicate appsettings.json; the target below
+         removes the API's copies, so downgrade the duplicate check to allow it. -->
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,5 +34,14 @@
   <ItemGroup>
     <None Update="electron.manifest.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
   </ItemGroup>
+
+  <!-- Milkora.API is referenced only for its controllers; drop its appsettings*.json
+       from publish so they don't collide with this host's own (NETSDK1152). -->
+  <Target Name="DropReferencedApiAppsettings" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+        Condition="$([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').StartsWith('appsettings')) and $([System.String]::Copy('%(ResolvedFileToPublish.FullPath)').Contains('Milkora.API'))" />
+    </ItemGroup>
+  </Target>
 
 </Project>

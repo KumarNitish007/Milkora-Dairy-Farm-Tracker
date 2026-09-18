@@ -1,1 +1,0 @@
-function n(t){let e=t.getTimezoneOffset()*6e4;return new Date(t.getTime()-e).toISOString().slice(0,10)}function r(){return n(new Date)}function o(t){let e=new Date;return e.setDate(e.getDate()-t),n(e)}function a(){let t=new Date;return n(new Date(t.getFullYear(),t.getMonth(),1))}export{r as a,o as b,a as c};
