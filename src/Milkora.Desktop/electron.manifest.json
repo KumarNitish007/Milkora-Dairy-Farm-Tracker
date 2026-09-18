@@ -26,11 +26,11 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "Assets/icon.ico"
+      "icon": "C:/NK_BACK/OneDrive - Shapoorji Pallonji & Company Pvt. Limited/NITISH/MILKORA/Milkora.DairyFarm/src/Milkora.Desktop/Assets/icon.ico"
     },
     "nsis": {
-      "installerIcon": "Assets/icon.ico",
-      "uninstallerIcon": "Assets/icon.ico"
+      "installerIcon": "C:/NK_BACK/OneDrive - Shapoorji Pallonji & Company Pvt. Limited/NITISH/MILKORA/Milkora.DairyFarm/src/Milkora.Desktop/Assets/icon.ico",
+      "uninstallerIcon": "C:/NK_BACK/OneDrive - Shapoorji Pallonji & Company Pvt. Limited/NITISH/MILKORA/Milkora.DairyFarm/src/Milkora.Desktop/Assets/icon.ico"
     },
     "files": [
       {
