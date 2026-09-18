@@ -39,3 +39,6 @@ installer/
 .DS_Store
 Thumbs.db
 *.log
+
+# API-hosted Angular build (regenerated)
+src/Milkora.API/wwwroot/

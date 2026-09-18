@@ -81,9 +81,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Serve the Angular app from wwwroot (single origin — enables the PWA / mobile install).
+// Populate wwwroot at deploy time: copy Milkora.Client/dist/milkora.client/browser here.
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseCors(CorsPolicy);
 app.UseSession();          // required by the Dotmim.Sync web server
 app.MapControllers();
+
+// SPA deep links (e.g. /animals) fall back to the Angular entry point.
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

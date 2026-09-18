@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Milkora</string>
+    <string name="title_activity_main">Milkora</string>
+    <string name="package_name">com.milkora.dairyfarmtracker</string>
+    <string name="custom_url_scheme">com.milkora.dairyfarmtracker</string>
+</resources>
